@@ -63,7 +63,7 @@ class RenderManager {
         const viewH = this.wViewHeight
 
         this.camera = new THREE.PerspectiveCamera(45, viewW / viewH, 1, 10000);
-        this.camera.position.set(500, 800, 1300);
+        this.camera.position.set(0, 500, 1000);
         this.camera.lookAt(0, 0, 0);
 
         this.scene = new THREE.Scene();
@@ -77,7 +77,7 @@ class RenderManager {
 
         // cubes
         this.cubeGeo = new THREE.BoxGeometry(50, 50, 50);
-        this.cubeMaterial = new THREE.MeshLambertMaterial({ color: 0xfeb74c, map: new THREE.TextureLoader().load('textures/square-outline-textured.png') });
+        this.cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.8, transparent: true });
 
         // grid
         const gridHelper = new THREE.GridHelper(1000, 20);
@@ -165,14 +165,13 @@ class RenderManager {
         if (intersects.length > 0) {
             const intersect = intersects[0];
 
-            // delete cube
             if (this.isShiftDown) {
                 if (intersect.object !== this.plane) {
+                    // delete cube
                     this.scene.remove(intersect.object);
                     this.objects.splice(this.objects.indexOf(intersect.object), 1);
                 }
-                // create cube
-            } else {
+            } else { // create cube
                 const voxel = new THREE.Mesh(this.cubeGeo, this.cubeMaterial);
                 voxel.position.copy(intersect.point).add(intersect.face.normal);
                 voxel.position.divideScalar(50).floor().multiplyScalar(50).addScalar(25);
