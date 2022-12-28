@@ -3,10 +3,10 @@ import { BorderThick } from '../common'
 import { editManager } from './editManager'
 
 export const RenderViewType = {
-    Perspective: 0,
-    XY: 1,
-    YZ: 2,
-    ZX: 3,
+    Perspective: 'Perspective',
+    XY: 'XY',
+    YZ: 'YZ',
+    ZX: 'ZX',
 }
 
 export default class RenderView {

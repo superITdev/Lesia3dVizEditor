@@ -1,3 +1,4 @@
+import { Typography } from '@mui/material'
 import React, { useEffect, useRef } from 'react'
 
 import { BorderThick } from '../common'
@@ -5,10 +6,10 @@ import { RenderViewType } from '../manager/renderView'
 import RenderView3d from './renderView3d'
 
 const Main3d = () => {
-    const container = useRef()
+    const renderViewRef = useRef()
 
     useEffect(() => {
-        const renderView = new RenderView3d(container.current, RenderViewType.Perspective)
+        const renderView = new RenderView3d(renderViewRef.current, RenderViewType.Perspective)
         renderView.initialize()
         renderView.render()
 
@@ -18,11 +19,22 @@ const Main3d = () => {
     }, [])
 
     return (
-        <div ref={container} tabIndex={0} style={{
+        <div style={{
+            position: 'relative',
             width: '50%',
             border: `${BorderThick}px solid grey`,
-            outline: 'none'
-        }} />
+        }}>
+            <div ref={renderViewRef} tabIndex={0} style={{
+                outline: 'none'
+            }} />
+
+            <Typography sx={{
+                position: 'absolute',
+                zIndex: 100,
+                right: 10,
+                top: 10,
+            }}>{RenderViewType.Perspective}</Typography>
+        </div>
     )
 }
 
