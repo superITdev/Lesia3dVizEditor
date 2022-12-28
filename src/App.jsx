@@ -1,10 +1,9 @@
 import './App.scss';
+import MainScene from './component/mainScene';
 
 function App() {
   return (
-    <div>
-      This is a Demo
-    </div>
+    <MainScene />
   );
 }
 
