@@ -6,9 +6,10 @@ import TranslateIcon from '@mui/icons-material/PanToolOutlined'
 import RotateIcon from '@mui/icons-material/Loop'
 import ScaleIcon from '@mui/icons-material/ZoomOutMap'
 
-import { BorderThick, ToolPadding, ToolZIndex } from '../common'
+import { BorderThick, EditToolMode, ToolPadding, ToolZIndex } from '../common'
 import { RenderViewType } from '../manager/renderView'
 import RenderView2d from './renderView2d'
+import { editManager } from '../manager/editManager'
 
 const CUI = {
   ToggleButtonGroup: {
@@ -18,26 +19,31 @@ const CUI = {
   }
 }
 
-const Editor2d = ({ viewerType = RenderViewType.XY }) => {
+const Editor2d = ({ viewType = RenderViewType.XY }) => {
+  const editorRef = useRef()
   const renderViewRef = useRef()
-  const [editMode, setEditMoe] = React.useState('')
 
-  const onEditMode = (event, nextView) => {
-    setEditMoe(nextView)
+  const [editMode, setEditMode] = React.useState('')
+
+  const onEditToolMode = (_, value) => {
+    setEditMode(value)
+
+    const thisView = editManager.getView(viewType)
+    thisView.changeEditToolMode(value)
   }
 
   useEffect(() => {
-    const renderView = new RenderView2d(renderViewRef.current, viewerType)
+    const renderView = new RenderView2d(editorRef.current, renderViewRef.current, viewType)
     renderView.initialize()
     renderView.render()
 
     return () => {
       renderView.destruct()
     }
-  }, [viewerType])
+  }, [viewType])
 
   return (
-    <div style={{
+    <div ref={editorRef} style={{
       position: 'relative',
       width: '50%',
       border: `${BorderThick}px solid grey`,
@@ -51,7 +57,7 @@ const Editor2d = ({ viewerType = RenderViewType.XY }) => {
         zIndex: ToolZIndex,
         right: ToolPadding,
         top: ToolPadding,
-      }}>{viewerType}</Typography>
+      }}>{viewType}</Typography>
 
       <Stack spacing={1} sx={{
         position: 'absolute',
@@ -59,23 +65,23 @@ const Editor2d = ({ viewerType = RenderViewType.XY }) => {
         left: ToolPadding,
         top: ToolPadding,
       }}>
-        <ToggleButtonGroup {...CUI.ToggleButtonGroup} value={editMode} onChange={onEditMode}>
-          <ToggleButton value="translateEntity" title='Translate cube' placement='left'>
+        <ToggleButtonGroup {...CUI.ToggleButtonGroup} value={editMode} onChange={onEditToolMode}>
+          <ToggleButton {...EditToolMode.translateEntity}>
             <TranslateIcon />
           </ToggleButton>
-          <ToggleButton value="scaleEntity" title='Scale cube'>
+          <ToggleButton {...EditToolMode.scaleEntity}>
             <ScaleIcon />
           </ToggleButton>
-          <ToggleButton value="rotateEntity" title='Rotate cube'>
+          <ToggleButton {...EditToolMode.rotateEntity}>
             <RotateIcon />
           </ToggleButton>
         </ToggleButtonGroup>
 
-        <ToggleButtonGroup {...CUI.ToggleButtonGroup} value={editMode} onChange={onEditMode}>
-          <ToggleButton value="camerFov" title='Change camera viewing angle'>
+        <ToggleButtonGroup {...CUI.ToggleButtonGroup} value={editMode} onChange={onEditToolMode}>
+          <ToggleButton {...EditToolMode.camerFov}>
             <CameraFovIcon />
           </ToggleButton>
-          <ToggleButton value="cameraMove" title='Move camera'>
+          <ToggleButton {...EditToolMode.cameraMove}>
             <CameraMoveIcon />
           </ToggleButton>
         </ToggleButtonGroup>

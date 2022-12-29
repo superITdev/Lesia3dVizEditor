@@ -1,8 +1,12 @@
 import * as THREE from 'three'
-import { DraftSize } from '../common'
+import { DraftSize, EditToolMode } from '../common'
+import { editManager } from '../manager/editManager';
 import RenderView, { RenderViewType } from '../manager/renderView'
 
 export default class RenderView2d extends RenderView {
+    editToolMode;
+    editToolCmd = null;
+
     initialize() {
         const viewW = this.wViewWidth
         const viewH = this.wViewHeight
@@ -43,5 +47,57 @@ export default class RenderView2d extends RenderView {
         this.renderer.setSize(viewW, viewH)
 
         this.render()
+    }
+
+    changeEditToolMode(editToolMode) {
+        this.editToolMode = editToolMode
+    }
+
+    onMouseDown = (event) => {
+        // console.log('onMouseDown', this.viewType, event)
+        switch (this.editToolMode) {
+            case EditToolMode.translateEntity.value: {
+                const hit = editManager.hitEntity(this.raycaster)
+                if (hit) {
+                    this.editToolCmd = {
+                        entity: hit.entity
+                    }
+                }
+                break
+            }
+            default: {
+                console.warn('onMouseDown: unhandled editToolMode', this.editToolMode)
+                break
+            }
+        }
+    }
+    onMouseDrag = (event) => {
+        // console.log('onMouseDrag', this.viewType, event)
+        if (!this.editToolCmd) {
+            return
+        }
+        switch (this.editToolMode) {
+            case EditToolMode.translateEntity.value: {
+                // const { entity } = this.editToolCmd
+                switch (this.viewType) {
+                    case RenderViewType.XY: {
+                        break
+                    }
+                    default: {
+                        console.warn('onMouseDrag: unhandled viewType', this.viewType)
+                        break
+                    }
+                }
+                break
+            }
+            default: {
+                console.warn('onMouseDrag: unhandled editToolMode', this.editToolMode)
+                break
+            }
+        }
+    }
+    onMouseUp = (event) => {
+        // console.log('onMouseUp', this.viewType, event)
+        this.editToolCmd = null
     }
 }

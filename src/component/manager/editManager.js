@@ -1,16 +1,18 @@
 import * as THREE from 'three'
 import { DraftSize, GridCellN } from '../common';
 import Entity from './entity';
+import { RenderViewType } from './renderView';
 
 class EditManager {
     scene;
     entity;
+    views = {}
 
     constructor() {
-        this.initialize()
+        this.createScene()
     }
 
-    initialize() {
+    createScene() {
         // scene
         this.scene = new THREE.Scene()
         this.scene.background = new THREE.Color(0xf0f0f0)
@@ -38,8 +40,39 @@ class EditManager {
         this.scene.add(directionalLight)
     }
 
-    render(renderer, camera) {
+    registerView(view) {
+        this.views[view.viewType] = view
+    }
+    getView(viewType) {
+        return this.views[viewType]
+    }
+
+    renderView(view) {
+        const { renderer, camera } = view
         renderer.render(this.scene, camera)
+    }
+    renderViews() {
+        for (const viewType in this.views) {
+            const view = this.getView(viewType)
+            this.renderView(view)
+        }
+    }
+
+    hitEntity(raycaster) {
+        return this.entity.hitTest(raycaster)
+    }
+
+    fullSizeMain3d(fullSize) {
+        const main3d = this.getView(RenderViewType.Perspective)
+
+        for (const viewType in this.views) {
+            const view = this.getView(viewType)
+            view.fullSizeView(view === main3d ? fullSize : false)
+        }
+    }
+    toggleSizeMain3d() {
+        const main3d = this.getView(RenderViewType.Perspective)
+        this.fullSizeMain3d(!main3d.fullSized)
     }
 }
 

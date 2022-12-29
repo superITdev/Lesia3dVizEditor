@@ -16,4 +16,15 @@ export default class Entity {
     addToScene(scene) {
         scene.add(this.mesh)
     }
+
+    hitTest(raycaster) {
+        const intersects = raycaster.intersectObject(this.mesh, false)
+        if (intersects.length > 0) {
+            const intersect = intersects[0]
+            if (intersect.object === this.mesh) {
+                return { ...intersect, entity: this }
+            }
+        }
+        return null
+    }
 }

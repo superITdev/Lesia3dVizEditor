@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { DraftSize } from '../common'
+import { editManager } from '../manager/editManager'
 import RenderView from '../manager/renderView'
 
 export default class RenderView3d extends RenderView {
@@ -13,5 +14,12 @@ export default class RenderView3d extends RenderView {
         this.camera.lookAt(0, 0, 0)
 
         super.initialize(this.camera)
+    }
+    onMouseDown = (event) => {
+        const hit = editManager.hitEntity(this.raycaster)
+        // console.log('onMouseDown', this.viewType, hit)
+        if (hit) {
+            editManager.toggleSizeMain3d()
+        }
     }
 }

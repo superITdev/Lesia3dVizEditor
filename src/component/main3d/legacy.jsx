@@ -5,10 +5,10 @@ import { DraftSize, GridCellSize } from '../common'
 const borderThick = 1
 
 export default function MainScene() {
-    const container = useRef()
+    const renderViewRef = useRef()
 
     useEffect(() => {
-        const renderManager = new RenderManager(container.current)
+        const renderManager = new RenderManager(renderViewRef.current)
         renderManager.initialize()
         renderManager.render()
 
@@ -18,7 +18,7 @@ export default function MainScene() {
     }, [])
 
     return (
-        <div ref={container} tabIndex={0} style={{
+        <div ref={renderViewRef} tabIndex={0} style={{
             width: '50%',
             border: `${borderThick}px solid grey`,
             outline: 'none'
@@ -28,29 +28,29 @@ export default function MainScene() {
 }
 
 class RenderManager {
-    container
-    renderer
-    camera
-    scene
+    renderViewDom;
+    renderer;
+    camera;
+    scene;
 
-    plane
-    pointer
-    raycaster
+    plane;
+    pointer;
+    raycaster;
     isShiftDown = false
 
-    rollOverMesh
-    rollOverMaterial
-    cubeGeo
-    cubeMaterial
+    rollOverMesh;
+    rollOverMaterial;
+    cubeGeo;
+    cubeMaterial;
 
-    objects = []
+    objects = [];
     //
-    constructor(container) {
-        this.container = container
+    constructor(renderViewDom) {
+        this.renderViewDom = renderViewDom
     }
     get renderViewer() { return this.renderer.domElement }
-    get viewWidth() { return this.container.clientWidth }
-    get viewHeight() { return this.container.clientHeight }
+    get viewWidth() { return this.renderViewDom.clientWidth }
+    get viewHeight() { return this.renderViewDom.clientHeight }
 
     get wViewWidth() {
         return Math.round(window.innerWidth / 2 - borderThick * 2)
@@ -109,13 +109,13 @@ class RenderManager {
         this.renderer.setPixelRatio(window.devicePixelRatio)
         this.renderer.setSize(viewW, viewH)
 
-        this.container.appendChild(this.renderer.domElement)
+        this.renderViewDom.appendChild(this.renderer.domElement)
 
         // { event handler
-        this.container.addEventListener('pointermove', this.onPointerMove)
-        this.container.addEventListener('pointerdown', this.onPointerDown)
-        this.container.addEventListener('keydown', this.onKeyDown)
-        this.container.addEventListener('keyup', this.onKeyUp)
+        this.renderViewDom.addEventListener('pointermove', this.onPointerMove)
+        this.renderViewDom.addEventListener('pointerdown', this.onPointerDown)
+        this.renderViewDom.addEventListener('keydown', this.onKeyDown)
+        this.renderViewDom.addEventListener('keyup', this.onKeyUp)
 
         window.addEventListener('resize', this.onWindowResize)
         // }
@@ -211,10 +211,10 @@ class RenderManager {
         this.renderViewer.remove()
 
         // { event handler
-        this.container.removeEventListener('pointermove', this.onPointerMove)
-        this.container.removeEventListener('pointerdown', this.onPointerDown)
-        this.container.removeEventListener('keydown', this.onKeyDown)
-        this.container.removeEventListener('keyup', this.onKeyUp)
+        this.renderViewDom.removeEventListener('pointermove', this.onPointerMove)
+        this.renderViewDom.removeEventListener('pointerdown', this.onPointerDown)
+        this.renderViewDom.removeEventListener('keydown', this.onKeyDown)
+        this.renderViewDom.removeEventListener('keyup', this.onKeyUp)
 
         window.removeEventListener('resize', this.onWindowResize)
         // }

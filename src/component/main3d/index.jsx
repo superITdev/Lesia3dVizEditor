@@ -6,10 +6,11 @@ import { RenderViewType } from '../manager/renderView'
 import RenderView3d from './renderView3d'
 
 const Main3d = () => {
+    const editorRef = useRef()
     const renderViewRef = useRef()
 
     useEffect(() => {
-        const renderView = new RenderView3d(renderViewRef.current, RenderViewType.Perspective)
+        const renderView = new RenderView3d(editorRef.current, renderViewRef.current, RenderViewType.Perspective)
         renderView.initialize()
         renderView.render()
 
@@ -19,7 +20,7 @@ const Main3d = () => {
     }, [])
 
     return (
-        <div style={{
+        <div ref={editorRef} style={{
             position: 'relative',
             width: '50%',
             border: `${BorderThick}px solid grey`,
