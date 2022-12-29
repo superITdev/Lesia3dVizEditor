@@ -136,6 +136,26 @@ export default class RenderView2d extends RenderView {
                             const sz = dz / bz + scale0.z
 
                             mesh.scale.set(sx, sy, sz)
+                            // let sx = diff.x / max.x
+                            // let sy = diff.y / max.y
+                            // let sz = diff.z / max.z
+
+                            // const dx = Math.abs(sx)
+                            // const dy = Math.abs(sy)
+                            // const dz = Math.abs(sz)
+
+                            // const md = Math.max(dx, dy, dz)
+                            // let ds = 0
+                            // if (md === dx) ds = sx
+                            // else if (md === dy) ds = sy
+                            // else ds = sz
+
+                            // const mins = 0.1
+                            // sx = Math.max(ds + scale0.x, mins)
+                            // sy = Math.max(ds + scale0.y, mins)
+                            // sz = Math.max(ds + scale0.z, mins)
+
+                            // mesh.scale.set(sx, sy, sz)
                             break
                         }
                         case EditToolMode.rotateEntity.value: {
