@@ -18,15 +18,15 @@ export default class RenderView2d extends RenderView {
             case RenderViewType.XY:
                 this.camera.position.set(0, 0, DraftSize)
                 this.camera.rotation.set(0, 0, 0)
-                break;
+                break
             case RenderViewType.YZ:
                 this.camera.position.set(DraftSize, 0, 0)
                 this.camera.rotation.set(0, Math.PI / 2, 0)
-                break;
+                break
             case RenderViewType.ZX:
                 this.camera.position.set(0, DraftSize, 0)
                 this.camera.rotation.set(-Math.PI / 2, 0, 0)
-                break;
+                break
             default:
                 console.warn('unhandled view type', this.viewType)
                 break
@@ -57,18 +57,34 @@ export default class RenderView2d extends RenderView {
     onMouseDown = (event) => {
         // console.log('onMouseDown', this.viewType, event)
         switch (this.editToolMode) {
-            case EditToolMode.translateEntity.value: {
-                const hit = editManager.hitEntity(this.raycaster)
-                if (hit) {
+            case EditToolMode.translateEntity.value:
+            case EditToolMode.scaleEntity.value:
+                {
+                    const hit = editManager.hitEntity(this.raycaster)
+                    if (!hit) {
+                        return
+                    }
+
                     const { object: mesh } = hit
                     const { vcs } = camera_scs2wcs(event.offsetX, event.offsetY, this.viewWidth, this.viewHeight, this.camera)
+
+                    const { geometry } = mesh
+                    geometry.computeBoundingBox()
+
                     this.editToolCmd = {
                         mesh,
+
+                        matrixWorld0: mesh.matrixWorld.clone(),
+                        matrixWorldInv0: mesh.matrixWorld.clone().invert(),
+                        position0: mesh.position.clone(),
+                        scale0: mesh.scale.clone(),
+                        boundingBox0: geometry.boundingBox.clone(),
+
+                        scs0: new THREE.Vector2(event.offsetX, event.offsetY),
                         local0: mesh.worldToLocal(vcs.clone())
                     }
+                    break
                 }
-                break
-            }
             default: {
                 console.warn('onMouseDown: unhandled editToolMode', this.editToolMode)
                 break
@@ -81,19 +97,49 @@ export default class RenderView2d extends RenderView {
             return
         }
         switch (this.editToolMode) {
-            case EditToolMode.translateEntity.value: {
-                const { mesh, local0 } = this.editToolCmd
-                const { vcs } = camera_scs2wcs(event.offsetX, event.offsetY, this.viewWidth, this.viewHeight, this.camera)
-                const local = mesh.worldToLocal(vcs)
+            case EditToolMode.translateEntity.value:
+            case EditToolMode.scaleEntity.value:
+                {
+                    const { mesh, matrixWorldInv0, position0, local0 } = this.editToolCmd
+                    const { vcs } = camera_scs2wcs(event.offsetX, event.offsetY, this.viewWidth, this.viewHeight, this.camera)
+                    const local = vcs.applyMatrix4(matrixWorldInv0)
 
-                const distance = local0.distanceTo(local)
-                const direction = local.sub(local0).normalize()
+                    switch (this.editToolMode) {
+                        case EditToolMode.translateEntity.value: {
+                            const distance = local0.distanceTo(local)
+                            const direction = local.sub(local0).normalize()
 
-                mesh.translateOnAxis(direction, distance)
-                mesh.updateMatrix()
-                editManager.renderViews()
-                break
-            }
+                            mesh.position.copy(position0)
+                            mesh.translateOnAxis(direction, distance)
+                            break
+                        }
+                        case EditToolMode.scaleEntity.value: {
+                            const { boundingBox0: { max }, scale0 } = this.editToolCmd
+                            const bx = max.x
+                            const by = max.y
+                            const bz = max.z
+
+                            const diff = local.sub(local0)
+                            const dx = diff.x
+                            const dy = diff.y
+                            const dz = diff.z
+
+                            const sx = dx / bx + scale0.x
+                            const sy = dy / by + scale0.y
+                            const sz = dz / bz + scale0.z
+
+                            mesh.scale.set(sx, sy, sz)
+                            break
+                        }
+                        default: {
+                            console.warn('onMouseDrag: unhandled editToolMode', this.editToolMode)
+                            break
+                        }
+                    }
+
+                    editManager.renderViews()
+                    break
+                }
             default: {
                 console.warn('onMouseDrag: unhandled editToolMode', this.editToolMode)
                 break

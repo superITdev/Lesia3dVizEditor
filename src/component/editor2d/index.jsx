@@ -23,7 +23,7 @@ const Editor2d = ({ viewType = RenderViewType.XY }) => {
   const editorRef = useRef()
   const renderViewRef = useRef()
 
-  const [editMode, setEditMode] = React.useState('')
+  const [editMode, setEditMode] = React.useState(EditToolMode.translateEntity.value)
 
   const onEditToolMode = (_, value) => {
     setEditMode(value)
@@ -36,6 +36,8 @@ const Editor2d = ({ viewType = RenderViewType.XY }) => {
     const renderView = new RenderView2d(editorRef.current, renderViewRef.current, viewType)
     renderView.initialize()
     renderView.render()
+
+    renderView.changeEditToolMode(EditToolMode.translateEntity.value)
 
     return () => {
       renderView.destruct()
