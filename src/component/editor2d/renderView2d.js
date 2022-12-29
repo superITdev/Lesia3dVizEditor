@@ -55,10 +55,12 @@ export default class RenderView2d extends RenderView {
     }
 
     onMouseDown = (event) => {
-        // console.log('onMouseDown', this.viewType, event)
+        const { offsetX: scx, offsetY: scy } = event
+
         switch (this.editToolMode) {
             case EditToolMode.translateEntity.value:
             case EditToolMode.scaleEntity.value:
+            case EditToolMode.rotateEntity.value:
                 {
                     const hit = editManager.hitEntity(this.raycaster)
                     if (!hit) {
@@ -66,7 +68,7 @@ export default class RenderView2d extends RenderView {
                     }
 
                     const { object: mesh } = hit
-                    const { vcs } = camera_scs2wcs(event.offsetX, event.offsetY, this.viewWidth, this.viewHeight, this.camera)
+                    const { vcs } = camera_scs2wcs(scx, scy, this.viewWidth, this.viewHeight, this.camera)
 
                     const { geometry } = mesh
                     geometry.computeBoundingBox()
@@ -78,9 +80,10 @@ export default class RenderView2d extends RenderView {
                         matrixWorldInv0: mesh.matrixWorld.clone().invert(),
                         position0: mesh.position.clone(),
                         scale0: mesh.scale.clone(),
+                        rotation0: mesh.rotation.clone(),
                         boundingBox0: geometry.boundingBox.clone(),
 
-                        scs0: new THREE.Vector2(event.offsetX, event.offsetY),
+                        scs0: new THREE.Vector2(scx, scy),
                         local0: mesh.worldToLocal(vcs.clone())
                     }
                     break
@@ -96,12 +99,16 @@ export default class RenderView2d extends RenderView {
         if (!this.editToolCmd) {
             return
         }
+
+        const { offsetX: scx, offsetY: scy } = event
+
         switch (this.editToolMode) {
             case EditToolMode.translateEntity.value:
             case EditToolMode.scaleEntity.value:
+            case EditToolMode.rotateEntity.value:
                 {
                     const { mesh, matrixWorldInv0, position0, local0 } = this.editToolCmd
-                    const { vcs } = camera_scs2wcs(event.offsetX, event.offsetY, this.viewWidth, this.viewHeight, this.camera)
+                    const { vcs } = camera_scs2wcs(scx, scy, this.viewWidth, this.viewHeight, this.camera)
                     const local = vcs.applyMatrix4(matrixWorldInv0)
 
                     switch (this.editToolMode) {
@@ -129,6 +136,18 @@ export default class RenderView2d extends RenderView {
                             const sz = dz / bz + scale0.z
 
                             mesh.scale.set(sx, sy, sz)
+                            break
+                        }
+                        case EditToolMode.rotateEntity.value: {
+                            const { scs0, rotation0 } = this.editToolCmd
+                            let angle = (scy - scs0.y) / this.wViewHeight * Math.PI
+
+                            const axis = new THREE.Vector3()
+                            this.camera.getWorldDirection(axis)
+                            axis.transformDirection(matrixWorldInv0)
+
+                            mesh.rotation.copy(rotation0)
+                            mesh.rotateOnAxis(axis, angle)
                             break
                         }
                         default: {
