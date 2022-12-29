@@ -6,6 +6,10 @@ import { RenderViewType } from './renderView';
 class EditManager {
     scene;
     entity;
+
+    mainCamera;
+    mainCameraHelper;
+
     views = {}
 
     constructor() {
@@ -39,6 +43,11 @@ class EditManager {
         directionalLight.position.set(1, 0.75, 0.5).normalize()
         this.scene.add(directionalLight)
     }
+    setMainCamera(mainCamera) {
+        this.mainCamera = mainCamera
+        this.mainCameraHelper = new THREE.CameraHelper(mainCamera)
+        this.scene.add(this.mainCameraHelper)
+    }
 
     registerView(view) {
         this.views[view.viewType] = view
@@ -48,7 +57,13 @@ class EditManager {
     }
 
     renderView(view) {
-        const { renderer, camera } = view
+        const { renderer, camera, viewType } = view
+
+        if (this.mainCameraHelper) {
+            const visible = (viewType !== RenderViewType.Perspective)
+            this.mainCameraHelper.visible = visible
+        }
+
         renderer.render(this.scene, camera)
     }
     renderViews() {

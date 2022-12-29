@@ -8,13 +8,13 @@ export default class Entity {
         const size = EntitySize
 
         const geometry = new THREE.BoxGeometry(size, size, size)
-        // const material = new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.8, transparent: true })
-        const material = new THREE.MeshLambertMaterial({
-            color: 0xfeb74c,
-            opacity: 0.9,
-            transparent: true,
-            map: new THREE.TextureLoader().load('textures/square-outline-textured.png')
-        })
+        const material = new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.8, transparent: true })
+        // const material = new THREE.MeshLambertMaterial({
+        //     color: 0xfeb74c,
+        //     opacity: 0.9,
+        //     transparent: true,
+        //     map: new THREE.TextureLoader().load('textures/square-outline-textured.png')
+        // })
         this.mesh = new THREE.Mesh(geometry, material)
         this.mesh.position.set(0, size / 2, 0)
     }

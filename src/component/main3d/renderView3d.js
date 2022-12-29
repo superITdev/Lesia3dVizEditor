@@ -13,11 +13,12 @@ export default class RenderView3d extends RenderView {
         this.camera.position.set(0, DraftSize / 2, DraftSize)
         this.camera.lookAt(0, 0, 0)
 
+        editManager.setMainCamera(this.camera)
+
         super.initialize(this.camera)
     }
     onMouseDown = (event) => {
         const hit = editManager.hitEntity(this.raycaster)
-        // console.log('onMouseDown', this.viewType, hit)
         if (hit) {
             editManager.toggleSizeMain3d()
         }
