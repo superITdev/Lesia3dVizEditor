@@ -80,9 +80,6 @@ const Editor2d = ({ viewType = RenderViewType.XY }) => {
         </ToggleButtonGroup>
 
         <ToggleButtonGroup {...CUI.ToggleButtonGroup} value={editMode} onChange={onEditToolMode}>
-          <ToggleButton {...EditToolMode.camerFov}>
-            <CameraFovIcon />
-          </ToggleButton>
           <ToggleButton {...EditToolMode.cameraMove}>
             <CameraMoveIcon />
           </ToggleButton>
