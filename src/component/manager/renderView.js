@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { BorderThick } from '../common'
+import { camera_scs2ncs } from '../util';
 import { editManager } from './editManager'
 
 export const RenderViewType = {
@@ -20,10 +21,6 @@ export default class RenderView {
     camera;
 
     raycaster = new THREE.Raycaster()
-
-    // { temporary values for performance
-    _2vec = new THREE.Vector2()
-    // }
 
     constructor(editorDom, renderViewDom, viewerType = RenderViewType.Perspective) {
         this.editorDom = editorDom
@@ -92,12 +89,8 @@ export default class RenderView {
     }
 
     updateRayCaster(event) {
-        const vw = this.viewWidth
-        const vh = this.viewHeight
-
-        this._2vec.set((event.offsetX / vw) * 2 - 1, - (event.offsetY / vh) * 2 + 1)
-
-        this.raycaster.setFromCamera(this._2vec, this.camera)
+        const ncs = camera_scs2ncs(event.offsetX, event.offsetY, this.viewWidth, this.viewHeight)
+        this.raycaster.setFromCamera(ncs, this.camera)
     }
 
     onWindowResize = () => {

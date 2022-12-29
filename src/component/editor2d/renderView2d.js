@@ -1,7 +1,8 @@
 import * as THREE from 'three'
-import { DraftSize, EditToolMode } from '../common'
+import { CameraNF, DraftSize, EditToolMode } from '../common'
 import { editManager } from '../manager/editManager';
 import RenderView, { RenderViewType } from '../manager/renderView'
+import { camera_scs2wcs } from '../util';
 
 export default class RenderView2d extends RenderView {
     editToolMode;
@@ -12,7 +13,7 @@ export default class RenderView2d extends RenderView {
         const viewH = this.wViewHeight
 
         // camera
-        this.camera = new THREE.OrthographicCamera(-viewW / 2, viewW / 2, viewH / 2, -viewH / 2, 1, DraftSize)
+        this.camera = new THREE.OrthographicCamera(-viewW / 2, viewW / 2, viewH / 2, -viewH / 2, 1, CameraNF)
         switch (this.viewType) {
             case RenderViewType.XY:
                 this.camera.position.set(0, 0, DraftSize)
@@ -59,8 +60,11 @@ export default class RenderView2d extends RenderView {
             case EditToolMode.translateEntity.value: {
                 const hit = editManager.hitEntity(this.raycaster)
                 if (hit) {
+                    const { object: mesh } = hit
+                    const { vcs } = camera_scs2wcs(event.offsetX, event.offsetY, this.viewWidth, this.viewHeight, this.camera)
                     this.editToolCmd = {
-                        entity: hit.entity
+                        mesh,
+                        local0: mesh.worldToLocal(vcs.clone())
                     }
                 }
                 break
@@ -78,16 +82,16 @@ export default class RenderView2d extends RenderView {
         }
         switch (this.editToolMode) {
             case EditToolMode.translateEntity.value: {
-                // const { entity } = this.editToolCmd
-                switch (this.viewType) {
-                    case RenderViewType.XY: {
-                        break
-                    }
-                    default: {
-                        console.warn('onMouseDrag: unhandled viewType', this.viewType)
-                        break
-                    }
-                }
+                const { mesh, local0 } = this.editToolCmd
+                const { vcs } = camera_scs2wcs(event.offsetX, event.offsetY, this.viewWidth, this.viewHeight, this.camera)
+                const local = mesh.worldToLocal(vcs)
+
+                const distance = local0.distanceTo(local)
+                const direction = local.sub(local0).normalize()
+
+                mesh.translateOnAxis(direction, distance)
+                mesh.updateMatrix()
+                editManager.renderViews()
                 break
             }
             default: {
