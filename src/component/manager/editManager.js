@@ -59,10 +59,8 @@ class EditManager {
     renderView(view) {
         const { renderer, camera, viewType } = view
 
-        if (this.mainCameraHelper) {
-            const visible = (viewType !== RenderViewType.Perspective)
-            this.mainCameraHelper.visible = visible
-        }
+        const visible = (viewType !== RenderViewType.Perspective)
+        this.mainCameraHelper.visible = visible
 
         renderer.render(this.scene, camera)
     }
