@@ -94,6 +94,18 @@ export default class RenderView2d extends RenderView {
                 }
                 break
             }
+            case EditToolMode.cameraMove.value: {
+                const { vcs } = camera_scs2wcs(scx, scy, this.viewWidth, this.viewHeight, this.camera)
+                const mainCamera = editManager.mainCamera
+
+                this.editToolCmd = {
+                    mainCamera,
+                    matrixWorldInv0: mainCamera.matrixWorld.clone().invert(),
+                    position0: mainCamera.position.clone(),
+                    local0: mainCamera.worldToLocal(vcs.clone())
+                }
+                break
+            }
             default: {
                 console.warn('onMouseDown: unhandled editToolMode', this.editToolMode)
                 break
@@ -187,6 +199,20 @@ export default class RenderView2d extends RenderView {
                 }
             case EditToolMode.camerFov.value: {
                 // const { scs0 } = this.editToolCmd
+                break
+            }
+            case EditToolMode.cameraMove.value: {
+                const { mainCamera, matrixWorldInv0, position0, local0 } = this.editToolCmd
+                const { vcs } = camera_scs2wcs(scx, scy, this.viewWidth, this.viewHeight, this.camera)
+                const local = vcs.applyMatrix4(matrixWorldInv0)
+
+                const distance = local0.distanceTo(local)
+                const direction = local.sub(local0).normalize()
+
+                mainCamera.position.copy(position0)
+                mainCamera.translateOnAxis(direction, distance)
+
+                editManager.renderViews()
                 break
             }
             default: {
