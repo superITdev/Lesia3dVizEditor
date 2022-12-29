@@ -20,8 +20,8 @@ export default class RenderView2d extends RenderView {
                 this.camera.rotation.set(0, 0, 0)
                 break
             case RenderViewType.YZ:
-                this.camera.position.set(DraftSize, 0, 0)
-                this.camera.rotation.set(0, Math.PI / 2, 0)
+                this.camera.position.set(-DraftSize, 0, 0)
+                this.camera.rotation.set(0, -Math.PI / 2, 0)
                 break
             case RenderViewType.ZX:
                 this.camera.position.set(0, DraftSize, 0)
@@ -88,6 +88,12 @@ export default class RenderView2d extends RenderView {
                     }
                     break
                 }
+            case EditToolMode.camerFov.value: {
+                this.editToolCmd = {
+                    scs0: new THREE.Vector2(scx, scy)
+                }
+                break
+            }
             default: {
                 console.warn('onMouseDown: unhandled editToolMode', this.editToolMode)
                 break
@@ -179,6 +185,10 @@ export default class RenderView2d extends RenderView {
                     editManager.renderViews()
                     break
                 }
+            case EditToolMode.camerFov.value: {
+                // const { scs0 } = this.editToolCmd
+                break
+            }
             default: {
                 console.warn('onMouseDrag: unhandled editToolMode', this.editToolMode)
                 break

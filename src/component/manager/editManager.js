@@ -21,6 +21,9 @@ class EditManager {
         this.scene = new THREE.Scene()
         this.scene.background = new THREE.Color(0xf0f0f0)
 
+        // const axesHelper = new THREE.AxesHelper(DraftSize)
+        // this.scene.add(axesHelper)
+
         // entity
         this.entity = new Entity()
         this.entity.create()
