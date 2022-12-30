@@ -21,6 +21,10 @@ export const EditToolMode = {
         value: 'rotateEntity',
         title: 'Rotate cube'
     },
+    camerFov: {
+        value: 'camerFov',
+        title: 'Change camera viewing angle'
+    },
     cameraMove: {
         value: 'cameraMove',
         title: 'Move camera'

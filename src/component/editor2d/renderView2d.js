@@ -88,6 +88,12 @@ export default class RenderView2d extends RenderView {
                     }
                     break
                 }
+            case EditToolMode.camerFov.value: {
+                this.editToolCmd = {
+                    scs0: new THREE.Vector2(scx, scy)
+                }
+                break
+            }
             case EditToolMode.cameraMove.value: {
                 const { vcs } = camera_scs2wcs(scx, scy, this.viewWidth, this.viewHeight, this.camera)
                 const mainCamera = editManager.mainCamera
@@ -191,6 +197,10 @@ export default class RenderView2d extends RenderView {
                     editManager.renderViews()
                     break
                 }
+            case EditToolMode.camerFov.value: {
+                // const { scs0 } = this.editToolCmd
+                break
+            }
             case EditToolMode.cameraMove.value: {
                 const { mainCamera, matrixWorldInv0, position0, local0 } = this.editToolCmd
                 const { vcs } = camera_scs2wcs(scx, scy, this.viewWidth, this.viewHeight, this.camera)
