@@ -76,7 +76,6 @@ export default class RenderView2d extends RenderView {
                     this.editToolCmd = {
                         mesh,
 
-                        matrixWorld0: mesh.matrixWorld.clone(),
                         matrixWorldInv0: mesh.matrixWorld.clone().invert(),
                         position0: mesh.position.clone(),
                         scale0: mesh.scale.clone(),
@@ -130,7 +129,7 @@ export default class RenderView2d extends RenderView {
             case EditToolMode.scaleEntity.value:
             case EditToolMode.rotateEntity.value:
                 {
-                    const { mesh, matrixWorldInv0, position0, local0 } = this.editToolCmd
+                    const { mesh, matrixWorldInv0, position0, scale0, local0 } = this.editToolCmd
                     const { vcs } = camera_scs2wcs(scx, scy, this.viewWidth, this.viewHeight, this.camera)
                     const local = vcs.applyMatrix4(matrixWorldInv0)
 
@@ -138,6 +137,7 @@ export default class RenderView2d extends RenderView {
                         case EditToolMode.translateEntity.value: {
                             const distance = local0.distanceTo(local)
                             const direction = local.sub(local0).normalize()
+                            direction.multiply(scale0)
 
                             mesh.position.copy(position0)
                             mesh.translateOnAxis(direction, distance)
