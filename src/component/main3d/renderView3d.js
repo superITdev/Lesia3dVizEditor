@@ -17,6 +17,29 @@ export default class RenderView3d extends RenderView {
 
         super.initialize(this.camera)
     }
+
+    onWindowResize = () => {
+        const viewW = this.wViewWidth
+        const viewH = this.wViewHeight
+        const viewAspect = viewW / viewH
+
+        // keep aspect
+        let vx = 0, vy = 0, vw = viewW, vh = viewH
+        this.renderer.setSize(vw, vh) // three.js bug: setViewport(0, 0, vw, vh)
+
+        const { aspect: cameraAspect } = this.camera
+        if (cameraAspect < viewAspect) {
+            vw = vh * cameraAspect
+            vx = (viewW - vw) / 2
+        } else if (viewAspect < cameraAspect) {
+            vh = vw / cameraAspect
+            vy = (viewH - vh) / 2
+        }
+        this.renderer.setViewport(vx, vy, vw, vh)
+
+        this.render()
+    }
+
     onMouseDown = (event) => {
         const hit = editManager.hitEntity(this.raycaster)
         if (hit) {

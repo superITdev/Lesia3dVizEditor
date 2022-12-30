@@ -203,7 +203,7 @@ export default class RenderView2d extends RenderView {
                     break
                 }
             case EditToolMode.camerFov.value: {
-                const maxFov = 120
+                const maxFov = 90
                 const minFov = 20
 
                 const maxAspect = 4
@@ -223,6 +223,7 @@ export default class RenderView2d extends RenderView {
                 // update
                 mainCamera.updateProjectionMatrix()
                 editManager.mainCameraHelper.update()
+                editManager.resetMainViewport()
 
                 editManager.renderViews()
                 break

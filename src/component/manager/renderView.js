@@ -97,8 +97,8 @@ export default class RenderView {
         const viewW = this.wViewWidth
         const viewH = this.wViewHeight
 
-        // this.camera.aspect = viewW / viewH
-        // this.camera.updateProjectionMatrix()
+        this.camera.aspect = viewW / viewH
+        this.camera.updateProjectionMatrix()
         this.renderer.setSize(viewW, viewH)
 
         this.render()

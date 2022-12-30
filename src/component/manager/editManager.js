@@ -73,6 +73,10 @@ class EditManager {
             this.renderView(view)
         }
     }
+    resetMainViewport() {
+        const view = this.getView(RenderViewType.Perspective)
+        view.onWindowResize()
+    }
 
     hitEntity(raycaster) {
         return this.entity.hitTest(raycaster)
