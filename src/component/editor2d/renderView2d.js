@@ -89,7 +89,12 @@ export default class RenderView2d extends RenderView {
                     break
                 }
             case EditToolMode.camerFov.value: {
+                const mainCamera = editManager.mainCamera
+
                 this.editToolCmd = {
+                    mainCamera,
+                    fov0: mainCamera.fov,
+                    aspect0: mainCamera.aspect,
                     scs0: new THREE.Vector2(scx, scy)
                 }
                 break
@@ -198,7 +203,28 @@ export default class RenderView2d extends RenderView {
                     break
                 }
             case EditToolMode.camerFov.value: {
-                // const { scs0 } = this.editToolCmd
+                const maxFov = 120
+                const minFov = 20
+
+                const maxAspect = 4
+                const minAspect = 0.2
+
+                // fov (vert)
+                const { mainCamera, fov0, aspect0, scs0 } = this.editToolCmd
+                const dfov = (scs0.y - scy) / this.viewHeight * maxFov
+                const fov = fov0 + dfov
+                mainCamera.fov = Math.min(Math.max(minFov, fov), maxFov)
+
+                // aspect (horz)
+                const daspect = (scx - scs0.x) / this.viewWidth * maxAspect
+                const aspect = aspect0 + daspect
+                mainCamera.aspect = Math.min(Math.max(minAspect, aspect), maxAspect)
+
+                // update
+                mainCamera.updateProjectionMatrix()
+                editManager.mainCameraHelper.update()
+
+                editManager.renderViews()
                 break
             }
             case EditToolMode.cameraMove.value: {
