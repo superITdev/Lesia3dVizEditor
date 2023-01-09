@@ -94,6 +94,21 @@ class EditManager {
         const main3d = this.getView(RenderViewType.Perspective)
         this.fullSizeMain3d(!main3d.fullSized)
     }
+    centerViews(pos) {
+        for (const viewType in this.views) {
+            const view = this.getView(viewType)
+            // view.camera.lookAt(pos.x, pos.y, pos.z)
+            // continue
+            const { camera } = view
+
+            const diff = pos.clone()
+            camera.worldToLocal(diff)
+            diff.z = 0
+            const distance = diff.length()
+            diff.normalize()
+            camera.translateOnAxis(diff, distance)
+        }
+    }
 }
 
 const editManager = new EditManager()

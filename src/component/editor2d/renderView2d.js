@@ -249,7 +249,26 @@ export default class RenderView2d extends RenderView {
         }
     }
     onMouseUp = (event) => {
-        // console.log('onMouseUp', this.viewType, event)
+        if (!this.editToolCmd) {
+            return
+        }
+
+        switch (this.editToolMode) {
+            case EditToolMode.translateEntity.value:
+                {
+                    const { mesh, position0 } = this.editToolCmd
+                    mesh.getWorldPosition(position0)
+                    editManager.centerViews(position0)
+                    
+                    editManager.renderViews()
+                    break
+                }
+            default: {
+                console.warn('onMouseDrag: unhandled editToolMode', this.editToolMode)
+                break
+            }
+        }
+
         this.editToolCmd = null
     }
 }
